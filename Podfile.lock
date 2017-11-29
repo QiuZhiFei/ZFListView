@@ -1,0 +1,19 @@
+PODS:
+  - MJRefresh (3.1.15)
+  - ZFListView (0.0.1)
+
+DEPENDENCIES:
+  - MJRefresh
+  - ZFListView (from `ZFListView/ZFListView.podspec`)
+
+EXTERNAL SOURCES:
+  ZFListView:
+    :path: ZFListView/ZFListView.podspec
+
+SPEC CHECKSUMS:
+  MJRefresh: 9af70f5f9327a2cf87f0fb5929f35fcc2fa638ea
+  ZFListView: ed2227988b88115c28ed5a4b6d519486b7aeef3f
+
+PODFILE CHECKSUM: a12b5383238435d7171469b5c60cf1dfafce221e
+
+COCOAPODS: 1.3.1
