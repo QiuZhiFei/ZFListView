@@ -5,7 +5,7 @@ use_frameworks!
 target 'ZFListViewDemo' do
   
   pod 'ZFListView',
-    :path => 'ZFListView/ZFListView.podspec'
+    :path => 'ZFListView.podspec'
 
   pod 'MJRefresh'
   
