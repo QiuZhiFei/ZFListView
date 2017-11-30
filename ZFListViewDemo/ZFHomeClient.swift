@@ -11,24 +11,31 @@ import ZFListView
 
 class ZFHomeClient: ZFListClient<String> {
   
-  override func loadTop() {
-    super.loadTop()
+  override func loadTop(page: Int, handler: (([String], Error?) -> ())?) {
+    super.loadTop(page: page, handler: handler)
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
       [weak self] in
       guard let `self` = self else { return }
-      self.finishData(page: self.page, items: self.getData(page: self.page))
+      if let handler = handler {
+        handler(self.getData(page: page), nil)
+      }
     }
   }
   
-  override func loadMore() {
-    super.loadMore()
+  override func loadMore(page: Int, handler: (([String], Error?) -> ())?) {
+    super.loadMore(page: page, handler: handler)
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
       [weak self] in
       guard let `self` = self else { return }
-      if self.page > 1 {
-        self.finishData(page: self.page + 1, items: [])
-      } else {
-        self.finishData(page: self.page + 1, items: self.getData(page: self.page  + 1))
+      if page > 1 {
+        if let handler = handler {
+          // 没有更多
+          handler([], nil)
+        }
+        return
+      }
+      if let handler = handler {
+        handler(self.getData(page: page), nil)
       }
     }
   }
@@ -36,10 +43,6 @@ class ZFHomeClient: ZFListClient<String> {
 }
 
 fileprivate extension ZFHomeClient {
-  
-  func loadData() {
-    
-  }
   
   func getData(page: Int) -> [String] {
     var data: [String] = []

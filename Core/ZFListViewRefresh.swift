@@ -23,6 +23,11 @@ public protocol ZFListViewRefresh {
   
   func addTopPullToRefreshIfNeeded(handler: (()->())?)
   
+  func removeTopPullToRefreshIfNeeded()
+  
   func addBottomPullToRefreshIfNeeded(handler: (()->())?)
+  
+  func removeBottomPullToRefreshIfNeeded()
+  
   
 }

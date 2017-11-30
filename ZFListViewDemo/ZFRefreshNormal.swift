@@ -59,6 +59,10 @@ class ZFListViewRefreshNormal: NSObject, ZFListViewRefresh {
     self.tableView.mj_header = normalHeader
   }
   
+  func removeTopPullToRefreshIfNeeded() {
+    self.tableView.mj_header = nil
+  }
+  
   func addBottomPullToRefreshIfNeeded(handler: (() -> ())?) {
     if let _ = self.tableView.mj_footer {
       return
@@ -76,6 +80,10 @@ class ZFListViewRefreshNormal: NSObject, ZFListViewRefresh {
     footer?.setTitle("没有更多", for: .noMoreData)
     footer?.isAutomaticallyHidden = true
     self.tableView.mj_footer = footer
+  }
+  
+  func removeBottomPullToRefreshIfNeeded() {
+    self.tableView.mj_footer = nil
   }
 
 }

@@ -22,7 +22,6 @@ open class ZFListView<T>: UIView {
       return self.refresh.tableView
     }
   }
-  internal fileprivate(set) var refresh: ZFListViewRefresh!
   
   open var displayTypeHandler: ((ZFListViewType)->())?
   
@@ -30,12 +29,16 @@ open class ZFListView<T>: UIView {
   open var heightForRowHandler: ((_ tableView: UITableView, _ indexPath: IndexPath)->(CGFloat))?
   open var didSelectRowHandler: ((_ tableView: UITableView, _ indexPath: IndexPath, _ data: T)->())?
   
-  fileprivate var client: ZFListClient<T>!
+  open var topRefreshEnabled: Bool = true
+  open var moreRefreshEnabled: Bool = true
+  
+  fileprivate var client: ZFListClientHandler<T>!
   fileprivate let dataSource = ZFListViewDataSource()
+  fileprivate var refresh: ZFListViewRefresh!
   
   public init(frame: CGRect, refresh: ZFListViewRefresh, client: ZFListClient<T>) {
     super.init(frame: frame)
-    self.client = client
+    self.client = ZFListClientHandler(client: client)
     self.refresh = refresh
     setup()
     
@@ -49,6 +52,38 @@ open class ZFListView<T>: UIView {
   
 }
 
+public extension ZFListView {
+  
+  func configure(topRefreshEnabled: Bool) {
+    self.topRefreshEnabled = topRefreshEnabled
+    
+    if topRefreshEnabled {
+      refresh.addTopPullToRefreshIfNeeded {
+        [weak self] in
+        guard let `self` = self else { return }
+        self.client.loadTop()
+      }
+      return
+    }
+    refresh.removeTopPullToRefreshIfNeeded()
+  }
+  
+  func configure(moreRefreshEnabled: Bool) {
+    self.moreRefreshEnabled = moreRefreshEnabled
+    
+    if moreRefreshEnabled {
+      refresh.addBottomPullToRefreshIfNeeded {
+        [weak self] in
+        guard let `self` = self else { return }
+        self.client.loadMore()
+      }
+      return
+    }
+    refresh.removeBottomPullToRefreshIfNeeded()
+  }
+  
+}
+
 fileprivate extension ZFListView {
   
   func setup() {
@@ -58,16 +93,8 @@ fileprivate extension ZFListView {
     addTableViewToSuperViewEdge(attribute: .bottom, multiplier: 1, constant: 0)
     addTableViewToSuperViewEdge(attribute: .right, multiplier: 1, constant: 0)
     
-    refresh.addTopPullToRefreshIfNeeded {
-      [weak self] in
-      guard let `self` = self else { return }
-      self.client.loadTop()
-    }
-    refresh.addBottomPullToRefreshIfNeeded {
-      [weak self] in
-      guard let `self` = self else { return }
-      self.client.loadMore()
-    }
+    self.configure(topRefreshEnabled: true)
+    self.configure(moreRefreshEnabled: true)
     
     client.loadSuccess = {
       [weak self] (items) in
@@ -84,7 +111,7 @@ fileprivate extension ZFListView {
       self.tableView.reloadData()
     }
     client.loadFailture = {
-      [weak self] (items) in
+      [weak self] (error) in
       guard let `self` = self else { return }
       self.refresh.stopAllLoading()
       if self.client.list.count != 0 {
