@@ -1,6 +1,6 @@
 PODS:
   - MJRefresh (3.1.15)
-  - ZFListView (0.0.1)
+  - ZFListView (0.0.2)
 
 DEPENDENCIES:
   - MJRefresh
@@ -12,7 +12,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   MJRefresh: 9af70f5f9327a2cf87f0fb5929f35fcc2fa638ea
-  ZFListView: d30873e85ff69fcc266304f5a062d7e530a0fa35
+  ZFListView: 28497307d78f0d01d46629f5428bc402566c88d9
 
 PODFILE CHECKSUM: 43310f8cbddedd9cfcf9c7e7c7876f3434fb7551
 
