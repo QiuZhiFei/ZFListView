@@ -13,38 +13,35 @@ fileprivate let cellReuseIdentifier = "cellReuseIdentifier"
 
 class ViewController: UIViewController {
   
-  fileprivate let dataSource = ZFListViewDataSource<String>()
-  fileprivate let tableView = UITableView(frame: .zero, style: .plain)
-  fileprivate let client = ZFHomeClient()
+  fileprivate let dataSource = ZFListViewNormalDataSource<String>()
   
   fileprivate var listView: ZFListView<String>!
   
   override func viewDidLoad() {
     super.viewDidLoad()
     
+    let tableView = UITableView(frame: .zero, style: .plain)
+    // 拆分刷新
     let refresh = ZFListViewRefreshNormal(tableView)
+    // 拆分网络加载
+    let client = ZFHomeClient()
+    
     listView = ZFListView(frame: .zero, refresh: refresh, client: client)
+    
+    // 配置刷新
     listView.configure(topRefreshEnabled: true)
     listView.configure(moreRefreshEnabled: true)
     
+    // 配置UI
     listView.tableView.delegate = dataSource
     listView.tableView.dataSource = dataSource
-    
     listView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
-    dataSource.getDataHandler = {
-      [weak self] (indexPath) in
-      guard let `self` = self else { return nil }
-      return self.listView.list[indexPath.row]
-    }
-    dataSource.numberOfSectionsHandler = {
-      [weak self] (tableView) in
-      guard let _ = self else { return 0 }
-      return 1
-    }
-    dataSource.numberOfRowsHandler = {
-      [weak self] (tableView, section) in
-      guard let `self` = self else { return 0 }
-      return self.listView.list.count
+    
+    listView.listChangedHandler = {
+      [weak self] (items) in
+      guard let `self` = self else { return }
+      self.dataSource.configure(list: items)
+      self.listView.tableView.reloadData()
     }
     dataSource.heightForRowHandler = {
       [weak self] (tableView, indexPath) in

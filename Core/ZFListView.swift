@@ -21,6 +21,7 @@ open class ZFListView<T>: UIView {
     return self.refresh.tableView
   }
   
+  open var listChangedHandler: (([T])->())?
   open var displayTypeHandler: ((ZFListViewType)->())?
   open var list: [T] {
     return self.client.list
@@ -86,6 +87,13 @@ fileprivate extension ZFListView {
     addTableViewToSuperViewEdge(attribute: .bottom, multiplier: 1, constant: 0)
     addTableViewToSuperViewEdge(attribute: .right, multiplier: 1, constant: 0)
     
+    client.listChangedHandler = {
+      [weak self] (items) in
+      guard let `self` = self else { return }
+      if let handler = self.listChangedHandler {
+        handler(items)
+      }
+    }
     client.loadSuccess = {
       [weak self] (items) in
       guard let `self` = self else { return }
@@ -98,7 +106,6 @@ fileprivate extension ZFListView {
       } else {
         self.displayType(type: .normal)
       }
-      self.tableView.reloadData()
     }
     client.loadFailture = {
       [weak self] (error) in

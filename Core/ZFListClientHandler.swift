@@ -18,6 +18,7 @@ class ZFListClientHandler<T>: NSObject {
   
   var loadSuccess: (([T])->())?
   var loadFailture: ((Error?)->())?
+  var listChangedHandler: (([T])->())?
   
   public init(client: ZFListClient<T>) {
     super.init()
@@ -61,9 +62,17 @@ fileprivate extension ZFListClientHandler {
     }
     
     self.page = page
+    self.list.append(contentsOf: items)
+    self.handleListChange()
+    
     if let handler = self.loadSuccess {
-      self.list.append(contentsOf: items)
       handler(items)
+    }
+  }
+  
+  func handleListChange() {
+    if let handler = self.listChangedHandler {
+      handler(self.list)
     }
   }
   
