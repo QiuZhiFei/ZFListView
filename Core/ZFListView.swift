@@ -18,22 +18,18 @@ import UIKit
 open class ZFListView<T>: UIView {
   
   open var tableView: UITableView  {
-    get {
-      return self.refresh.tableView
-    }
+    return self.refresh.tableView
   }
   
   open var displayTypeHandler: ((ZFListViewType)->())?
+  open var list: [T] {
+    return self.client.list
+  }
   
-  open var cellForRowHandler: ((_ tableView: UITableView, _ indexPath: IndexPath, _ data: T)->(UITableViewCell?))?
-  open var heightForRowHandler: ((_ tableView: UITableView, _ indexPath: IndexPath)->(CGFloat))?
-  open var didSelectRowHandler: ((_ tableView: UITableView, _ indexPath: IndexPath, _ data: T)->())?
-  
-  open var topRefreshEnabled: Bool = true
-  open var moreRefreshEnabled: Bool = true
+  open fileprivate(set) var topRefreshEnabled: Bool = true
+  open fileprivate(set) var moreRefreshEnabled: Bool = true
   
   fileprivate var client: ZFListClientHandler<T>!
-  fileprivate let dataSource = ZFListViewDataSource()
   fileprivate var refresh: ZFListViewRefresh!
   
   public init(frame: CGRect, refresh: ZFListViewRefresh, client: ZFListClient<T>) {
@@ -41,9 +37,6 @@ open class ZFListView<T>: UIView {
     self.client = ZFListClientHandler(client: client)
     self.refresh = refresh
     setup()
-    
-    self.tableView.delegate = dataSource
-    self.tableView.dataSource = dataSource
   }
   
   required public init?(coder aDecoder: NSCoder) {
@@ -93,9 +86,6 @@ fileprivate extension ZFListView {
     addTableViewToSuperViewEdge(attribute: .bottom, multiplier: 1, constant: 0)
     addTableViewToSuperViewEdge(attribute: .right, multiplier: 1, constant: 0)
     
-    self.configure(topRefreshEnabled: true)
-    self.configure(moreRefreshEnabled: true)
-    
     client.loadSuccess = {
       [weak self] (items) in
       guard let `self` = self else { return }
@@ -120,48 +110,8 @@ fileprivate extension ZFListView {
         self.displayType(type: .networkErr)
       }
     }
-    
-    dataSource.numberOfSectionsHandler = {
-      (_) in
-      return 1
-    }
-    dataSource.numberOfRowsHandler = {
-      [weak self] (tableView, section) in
-      guard let `self` = self else { return 0}
-      return self.client.list.count
-    }
-    dataSource.heightForRowHandler = {
-      [weak self] (tableView, indexPath) in
-      guard let `self` = self else { return 44 }
-      if let handler = self.heightForRowHandler {
-        return handler(tableView, indexPath)
-      }
-      return 44
-    }
-    dataSource.cellForRowHandler = {
-      [weak self] (tableView, indexPath) in
-      guard let `self` = self else { return nil }
-      if let handler = self.cellForRowHandler {
-        let data = self.getData(indexPath: indexPath)
-        return handler(tableView, indexPath, data)
-      }
-      return nil
-    }
-    dataSource.didSelectRowHandler = {
-      [weak self] (tableView, indexPath) in
-      guard let `self` = self else { return }
-      tableView.deselectRow(at: indexPath, animated: true)
-      if let handler = self.didSelectRowHandler {
-        let data = self.getData(indexPath: indexPath)
-        return handler(tableView, indexPath, data)
-      }
-    }
   }
-  
-  func getData(indexPath: IndexPath) -> T {
-    return self.client.list[indexPath.row]
-  }
-  
+
   func displayType(type: ZFListViewType) {
     if let handler = self.displayTypeHandler {
       handler(type)

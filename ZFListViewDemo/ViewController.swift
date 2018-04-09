@@ -13,6 +13,7 @@ fileprivate let cellReuseIdentifier = "cellReuseIdentifier"
 
 class ViewController: UIViewController {
   
+  fileprivate let dataSource = ZFListViewDataSource<String>()
   fileprivate let tableView = UITableView(frame: .zero, style: .plain)
   fileprivate let client = ZFHomeClient()
   
@@ -23,17 +24,42 @@ class ViewController: UIViewController {
     
     let refresh = ZFListViewRefreshNormal(tableView)
     listView = ZFListView(frame: .zero, refresh: refresh, client: client)
+    listView.configure(topRefreshEnabled: true)
+    listView.configure(moreRefreshEnabled: true)
+    
+    listView.tableView.delegate = dataSource
+    listView.tableView.dataSource = dataSource
     
     listView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
-    listView.cellForRowHandler = {
+    dataSource.getDataHandler = {
+      [weak self] (indexPath) in
+      guard let `self` = self else { return nil }
+      return self.listView.list[indexPath.row]
+    }
+    dataSource.numberOfSectionsHandler = {
+      [weak self] (tableView) in
+      guard let _ = self else { return 0 }
+      return 1
+    }
+    dataSource.numberOfRowsHandler = {
+      [weak self] (tableView, section) in
+      guard let `self` = self else { return 0 }
+      return self.listView.list.count
+    }
+    dataSource.heightForRowHandler = {
+      [weak self] (tableView, indexPath) in
+      guard let _ = self else { return 0 }
+      return 44
+    }
+    dataSource.cellForRowHandler = {
       (tableView, indexPath, data) in
       let cell = tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier, for: indexPath)
       cell.textLabel?.text = data
       return cell
     }
-    listView.didSelectRowHandler = {
+    dataSource.didSelectRowHandler = {
       (tableView, indexPath, data) in
-      debugPrint("did select \(data)")
+      debugPrint("did select \(data ?? "data")")
     }
     
     view.addSubview(listView)
