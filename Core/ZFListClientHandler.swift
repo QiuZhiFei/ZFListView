@@ -7,31 +7,31 @@
 
 import UIKit
 
-private let defaultTopPage = 0
-
 class ZFListClientHandler<T>: NSObject {
   
-  fileprivate(set) var page: Int = defaultTopPage
+  fileprivate(set) var page: Int
   fileprivate(set) var list: [T] = []
   
-  fileprivate var client: ZFListClient<T>!
+  fileprivate var client: ZFListClient<T>
   
   var loadSuccess: (([T])->())?
   var loadFailture: ((Error?)->())?
   var listChangedHandler: (([T])->())?
   
   public init(client: ZFListClient<T>) {
-    super.init()
     self.client = client
+    self.page = self.client.defaultTopPage
+    super.init()
   }
   
   func loadTop() {
     resetData()
 
+    let page = self.page
     client.loadTop(page: page) {
       [weak self] (items, error) in
       guard let `self` = self else { return }
-      self.handleData(page: defaultTopPage, items: items, error: error)
+      self.handleData(page: page, items: items, error: error)
     }
   }
   
@@ -45,7 +45,7 @@ class ZFListClientHandler<T>: NSObject {
   }
   
   func resetData() {
-    self.page = defaultTopPage
+    self.page = self.client.defaultTopPage
     self.list = []
   }
   

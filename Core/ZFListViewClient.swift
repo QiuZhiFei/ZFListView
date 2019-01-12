@@ -10,6 +10,10 @@ import Foundation
 
 open class ZFListClient<T>: NSObject {
   
+  open var defaultTopPage: Int {
+    return 0
+  }
+  
   open func loadTop(page: Int, handler: (([T], Error?)->())?) {
     //
   }

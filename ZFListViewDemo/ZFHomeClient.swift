@@ -11,6 +11,10 @@ import ZFListView
 
 class ZFHomeClient: ZFListClient<String> {
   
+  override var defaultTopPage: Int {
+    return 1
+  }
+  
   override func loadTop(page: Int, handler: (([String], Error?) -> ())?) {
     super.loadTop(page: page, handler: handler)
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
@@ -27,7 +31,7 @@ class ZFHomeClient: ZFListClient<String> {
     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 2) {
       [weak self] in
       guard let `self` = self else { return }
-      if page > 1 {
+      if page > 2 {
         if let handler = handler {
           // 没有更多
           handler([], nil)
