@@ -125,7 +125,7 @@ fileprivate extension ZFListView {
     }
   }
   
-  func addTableViewToSuperViewEdge(attribute: NSLayoutAttribute, multiplier: CGFloat, constant: CGFloat) {
+  func addTableViewToSuperViewEdge(attribute: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) {
     tableView.translatesAutoresizingMaskIntoConstraints = false
     let layout = NSLayoutConstraint(item: tableView, attribute: attribute, relatedBy: .equal, toItem: tableView.superview!, attribute: attribute, multiplier: multiplier, constant: constant)
     tableView.superview?.addConstraint(layout)

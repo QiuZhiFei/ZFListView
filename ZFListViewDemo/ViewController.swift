@@ -84,7 +84,7 @@ class ViewController: UIViewController {
 
 extension UIView {
   
-  func zf_addLayoutToSuperViewEdge(attribute: NSLayoutAttribute, multiplier: CGFloat, constant: CGFloat) {
+  func zf_addLayoutToSuperViewEdge(attribute: NSLayoutConstraint.Attribute, multiplier: CGFloat, constant: CGFloat) {
     guard let superview = self.superview else {
       debugPrint("add layout need superView")
       return

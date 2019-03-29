@@ -12,7 +12,7 @@ import ZFListView
 class ZFHomeClient: ZFListClient<String> {
   
   override var defaultTopPage: Int {
-    return 1
+    return 0
   }
   
   override func loadTop(page: Int, handler: (([String], Error?) -> ())?) {
